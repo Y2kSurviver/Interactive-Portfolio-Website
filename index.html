@@ -3,15 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <!--    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous"> -->
-    <link href="css/main.css">
-</head>
+    <title>Portfolio Website</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr" crossorigin="anonymous"> 
+    <link href="main.css" rel="stylesheet">
+</head> 
 <body>
-    <div id="screen"></div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js" integrity="sha512-6+7rTBmR6pRFe9fa0vCFjFaHZj/XYa7774bEBzRtxgdpIJOS++R3cKd6Prg/eJmxtsJotd8KAg4g57uuVQsZKA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src=js/button.js></script>
-    <script src="js/main.js"></script>
+   <!-- Overlay of the website -->
+   <div id="hero-section" class="position-relative z-1 vw-100 vh-100 d-flex flex-column">
+       <div class="d-flex align-self-end">
+        <button class="btn bg-transparent text-white btn-sm fw-bold rounded-pill">About me</button>
+        <button class="btn bg-transparent text-white btn-sm fw-bold rounded-pill">Contact</button>
+        <button class="btn bg-transparent text-white btn-sm fw-bold rounded-pill">Blog</button>
+        </div>
+        <p class="mt-auto text-white">Designing Experiences, Engineering Solutions</p>
+        <p class="lead text-white fs-6 w-75">
+        As a university professional passionate about web technologies and innovative coding practices, I blend creativity with technical expertise to build engaging digital experiences and push the boundaries of modern development.
+        </p>
+ 
+   </div>
+
+    <!-- The sketch -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.9/lib/p5.min.js"></script>
+    <script src="canvas/vehicle.js"></script>
+    <script src="canvas/main.js"></script>
 </body>
 </html>
 
