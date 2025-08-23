@@ -6,9 +6,10 @@ class Vehicle {
     this.target = createVector(x, y);
     this.vel = p5.Vector.random2D();
     this.acc = createVector();
-    this.r = 10;
+    this.r = 6;
     this.maxspeed = 4;
     this.detection = 120;
+    this.maxForce = 0.6;
   }
   
   screenWrap() {
@@ -26,21 +27,26 @@ class Vehicle {
   
   behaviors() {
     // behaviors
-//    const seek = this.seek(this.target);
+    // const mouse = createVector(mouseX, mouseY);
+    // const seek = this.seek(mouse);
     const separation = this.separation(vehicles);
     const cohesion = this.cohesion(vehicles); 
     const alignment = this.alignment(vehicles);
+    const avoidence = this.avoidence(obstacles, aheadLen);
+
     // weights
-  //  seek.mult(0.1);
+    //seek.mult(0.7);
+    avoidence.mult(avoidenceWeight);
     separation.mult(separationWeight);
     cohesion.mult(cohesionWeight);
-    
+    alignment.mult(alignmentWeight);
+
     // applying the force
+    this.applyForce(avoidence);
     this.applyForce(separation);
     this.applyForce(cohesion);
+    this.applyForce(alignment);
 
-    //this.vel.setHeading(this.vel.heading() + alignment * alignmentWeight);
-   // this.applyForce(seek);
   }
 
   applyForce(f) {
@@ -48,6 +54,7 @@ class Vehicle {
   }
 
   update() {
+    this.acc.limit(this.maxForce);
     this.vel.limit(this.maxspeed);
     this.vel.add(this.acc);
     this.pos.add(this.vel);
@@ -85,24 +92,52 @@ class Vehicle {
 
   }
 
+  // obstacle avoidance
+  avoidence(obstacles, aheadLen) {
+    const ahead = this.pos.copy();
+    ahead.add(this.vel.copy().setMag(aheadLen)); 
+
+    // Debugging
+    // fill(255, 0, 0);
+    // circle(ahead.x, ahead.y, 5);
+
+    for (let obstacle of obstacles) {
+      // Debugging
+      // stroke(0, 255, 0);
+      // noFill();
+      // rect(obstacle.x, obstacle.y, obstacle.width,obstacle.height);
+      const center = createVector(obstacle.x + obstacle.width / 2, obstacle.y + obstacle.height / 2);
+      //fill(255, 0, 255);
+      //circle(center.x, center.y, 20); 
+      if (this.collision(ahead, obstacle)) {
+        const steer = p5.Vector.sub(ahead, center);
+        // Debugging
+        /*push()
+        translate(center);
+        rotate(steer.heading());
+        stroke(255, 0, 0);
+        line(0, 0, 100, 0);
+        pop();
+        */
+        return steer.normalize();
+      }
+    }
+    return createVector();
+  }
+
   alignment(vehicles) {
-    let avgAngle = 0;
+    const avgVel = createVector();
     let count = 0;
     vehicles.forEach(vehicle => {
       const dist = p5.Vector.dist(this.pos, vehicle.pos);
       if (dist < this.detection && this != vehicle) {
-        avgAngle += vehicle.vel.heading();
+        avgVel.add(vehicle.vel);
         count++;
       }
     });
 
-    if (count > 0) {
-      //console.log(avgAngle / count);
-      //avgAngle /= count;
-      const diff = this.vel.heading() - avgAngle;
-      return diff;
-    }
-    return count;
+    if (count > 0) return avgVel.normalize();
+    return createVector();
   }
 
   cohesion(vehicles) {
@@ -118,10 +153,9 @@ class Vehicle {
     
     if (count > 0) {
       center.mult(1 / count);
-      const steer = p5.Vector.sub(center, this.pos);
-      return steer.normalize();
+      const seekCenter = this.seek(center);
+      return seekCenter;
     }
-    
     return createVector();
   }
 
@@ -143,26 +177,19 @@ class Vehicle {
 
   seek(target) {
     var desired = p5.Vector.sub(target, this.pos);
-    var d = desired.mag();
-    /*var speed = this.maxspeed;
-    if (d < 100) {
-      speed = map(d, 0, 100, 0, this.maxspeed);
-    }*/
     var steer = p5.Vector.sub(desired, this.vel);
     return steer.normalize();
   }
 
   flee(target) {
     var desired = p5.Vector.sub(target, this.pos);
-    var d = desired.mag();
-    if (d < 50) {
-      desired.setMag(this.maxspeed);
-      desired.mult(-1);
-      var steer = p5.Vector.sub(desired, this.vel);
-      steer.limit(this.maxforce);
-      return steer;
-    } else {
-      return createVector(0, 0);
-    }
+    var steer = p5.Vector.sub(desired, this.vel);
+    steer.mult(-1);
+    return steer;
+  }
+
+  // collision between a point and rectangle
+  collision(p, r) {
+    return (p.x > r.x && p.x < r.x + r.width && p.y > r.y && p.y < r.y + r.height);
   }
 }
